@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yo AmoO mi Cabello</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Reset y estilos base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #fff5f5;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .categories {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .category-btn {
+            background: none;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-btn.active {
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+        }
+
+        /* Productos */
+        .products-section {
+            margin-top: 100px;
+            padding: 1rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .product-price {
+            color: #ff6b6b;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+
+        .add-to-cart {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        /* Carrito */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 90%;
+            max-width: 400px;
+            height: 100%;
+            background: white;
+            box-shadow: -2px 0 15px rgba(0,0,0,0.2);
+            transition: right 0.3s;
+            padding: 1.5rem;
+            overflow-y: auto;
+            z-index: 2000;
+        }
+
+        .cart-overlay.active {
+            right: 0;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #fff5f5;
+            border-radius: 10px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .remove-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* Redes Sociales */
+        .social-media {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .social-link {
+            background: #ff6b6b;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .categories {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">Yo AmoO mi Cabello</div>
+            <div class="categories">
+                <button class="category-btn active" data-category="alisantes">Alisantes</button>
+                <button class="category-btn" data-category="kits">Kits</button>
+            </div>
+            <button class="cart-btn"><i class="fas fa-shopping-cart"></i> (<span class="cart-count">0</span>)</button>
+        </nav>
+    </header>
+
+    <main class="products-section">
+        <div class="products-grid" id="products-container">
+            <!-- Productos se cargan dinámicamente -->
+        </div>
+    </main>
+
+    <div class="cart-overlay">
+        <h2>🛒 Tu Carrito</h2>
+        <div class="cart-items"></div>
+        <div class="cart-total">Total: $0</div>
+        <button class="checkout-btn">Pagar Ahora</button>
+    </div>
+
+    <div class="social-media">
+        <a href="https://www.facebook.com/yoamoomicabello" class="social-link" target="_blank">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://www.tiktok.com/@franciisreyes6?lang=es" class="social-link" target="_blank">
+            <i class="fab fa-tiktok"></i>
+        </a>
+        <a href="https://www.instagram.com/franciisreyesramirez/" class="social-link" target="_blank">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://wa.me/3232328680" class="social-link" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+
+    <script>
+        // Datos de productos
+        const products = {
+            alisantes: [
+                {name: "Alicante definitivo 1L", price: 1800, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Alicante japonés uva y fresa 1L", price: 1800, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Japonés con botóx 1L", price: 1800, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Botóx alisante 1L", price: 1800, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Encerado capilar 1L", price: 1800, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Krabrasileña 1L", price: 1800, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Keratina efecto espejo 1L", price: 1800, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Nanoplastia 1L", price: 2000, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Nanoplastia 1/2", price: 1050, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Alisante definitivo 1/2L", price: 1050, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Japonés botox 1/2L", price: 1050, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Botox alisante 1/2L", price: 1050, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Cierre técnico", price: 550, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Galón de 3.8 litros de BÓTOX", price: 3200, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Galón de 3.8 litros de japonés con BÓTOX", price: 3200, category: 'alisantes', image: 'https://via.placeholder.com/200x200'},
+                {name: "Galón de 3.8 litros de alisante kerabrasileña", price: 3280, category: 'alisantes', image: 'https://via.placeholder.com/200x200'}
+            ],
+            kits: [
+                {name: "KIT REPARADOR", price: 690, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit post Alaciado", price: 690, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit ALISANTE", price: 2650, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit anticaspa/anticaída", price: 530, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit de muestras alisantes", price: 1800, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit post Alaciado", price: 1470, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit post de 2 piezas", price: 550, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit de 2 piezas precio mayoreo apartir de 3 kits", price: 930, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit post de 3 piezas / mayoreo PAQUETE CON 3 kits (9 piezas)", price: 1260, category: 'kits', image: 'https://via.placeholder.com/200x200'},
+                {name: "Kit Orgánico para niñas", price: 450, category: 'kits', image: 'https://via.placeholder.com/200x200'}
+            ]
+        };
+
+        let cart = [];
+        
+        function renderProducts(category) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+            
+            products[category].forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" class="product-image" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p class="product-price">$${product.price}</p>
+                    <button class="add-to-cart" onclick="addToCart('${product.name}', ${product.price}, '${product.image}')">
+                        Añadir al Carrito
+                    </button>
+                `;
+                container.appendChild(productCard);
+            });
+        }
+
+        function updateCart() {
+            const cartItems = document.querySelector('.cart-items');
+            const cartTotal = document.querySelector('.cart-total');
+            const cartCount = document.querySelector('.cart-count');
+            
+            cartItems.innerHTML = '';
+            let total = 0;
+            
+            cart.forEach((item, index) => {
+                total += item.price * item.quantity;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                itemElement.innerHTML = `
+                    <img src="${item.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                    <div>
+                        <h4>${item.name}</h4>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                        </div>
+                        <p>$${item.price * item.quantity}</p>
+                    </div>
+                    <button class="remove-btn" onclick="removeItem(${index})">Eliminar</button>
+                `;
+                cartItems.appendChild(itemElement);
+            });
+            
+            cartTotal.textContent = `Total: $${total}`;
+            cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        }
+
+        function addToCart(name, price, image) {
+            const existingItem = cart.find(item => item.name === name);
+            if(existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({name, price, image, quantity: 1});
+            }
+            updateCart();
+        }
+
+        function updateQuantity(index, change) {
+            cart[index].quantity += change;
+            if(cart[index].quantity < 1) cart.splice(index, 1);
+            updateCart();
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        // Event Listeners
+        document.querySelector('.cart-btn').addEventListener('click', () => {
+            document.querySelector('.cart-overlay').classList.toggle('active');
+        });
+
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderProducts(btn.dataset.category);
+            });
+        });
+
+        // Scroll Header
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > lastScroll && currentScroll > 100) {
+                document.querySelector('.header').classList.add('hidden');
+            } else {
+                document.querySelector('.header').classList.remove('hidden');
+            }
+            lastScroll = currentScroll;
+        });
+
+        // Inicializar
+        renderProducts('alisantes');
+    </script>
+</body>
+</html>
